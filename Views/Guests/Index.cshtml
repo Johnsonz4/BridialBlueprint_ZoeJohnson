@@ -1,0 +1,90 @@
+﻿@model IEnumerable<BridalBlueprint.Models.Guest>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RSVPStatus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MealPreference)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Wedding)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+              <select class="form-control rsvp-dropdown" data-id="@item.GuestId">
+                        <option value="Pending" selected="@(item.RSVPStatus == "Pending")">Pending</option>
+                        <option value="Accepted" selected="@(item.RSVPStatus == "Accepted")">Accepted</option>
+                        <option value="Declined" selected="@(item.RSVPStatus == "Declined")">Declined</option>
+
+             </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MealPreference)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Wedding.Title)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.GuestId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.GuestId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.GuestId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.rsvp-dropdown').on('change', function () {
+                const guestId = $(this).data('id');
+                const newStatus = $(this).val();
+
+                $.ajax({
+                    url: '/Guests/UpdateRSVP',
+                    type: 'POST',
+                    data: {
+                        id: guestId,
+                        rsvpStatus: newStatus
+                    },
+                    success: function () {
+                        console.log('RSVP status updated.');
+                    },
+                    error: function () {
+                        alert('Something went wrong while updating RSVP.');
+                    }
+                });
+            });
+        });
+    </script>
+}
+

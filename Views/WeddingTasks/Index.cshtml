@@ -1,0 +1,102 @@
+﻿@model IEnumerable<BridalBlueprint.Models.WeddingTask>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<!-- Hidden anti-forgery token for AJAX -->
+<form id="antiForgeryForm" style="display:none">
+    @Html.AntiForgeryToken()
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DueDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsCompleted)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Wedding)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DueDate)
+                </td>
+                <td>
+                    <input type="checkbox"
+                           class="complete-checkbox"
+                           data-id="@item.WeddingTaskId"
+                    @(item.IsCompleted ? "checked" : "") />
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Wedding.Title)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.WeddingTaskId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.WeddingTaskId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.WeddingTaskId">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(function () {
+            $('.complete-checkbox').on('change', function () {
+                const weddingtaskId = $(this).data('id');
+                const isCompleted = $(this).is(':checked');
+                const token = $('#antiForgeryForm input[name="__RequestVerificationToken"]').val();
+
+                $.ajax({
+                    url: '/WeddingTasks/ToggleComplete',
+                    type: 'POST',
+                    data: {
+                        id: weddingtaskId,
+                        isCompleted: isCompleted
+                    },
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
+                    success: function () {
+                        console.log('Task updated');
+                    },
+                    error: function () {
+                        alert('Something went wrong.');
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+
